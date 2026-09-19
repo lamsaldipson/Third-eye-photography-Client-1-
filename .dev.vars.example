@@ -1,0 +1,4 @@
+# Local secrets for `npm run preview` (wrangler/workerd), separate from
+# .env.local which only `next dev` reads.
+# Copy this file to .dev.vars and set a real value — do not commit .dev.vars.
+ADMIN_PASSWORD=admin

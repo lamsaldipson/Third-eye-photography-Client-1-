@@ -5,6 +5,8 @@ export const metadata = {
   title: "Gallery — Third Eye Photography",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function GalleryPage() {
   const images = await getGallery();
 

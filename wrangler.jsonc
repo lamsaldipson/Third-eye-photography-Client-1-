@@ -1,0 +1,38 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "third-eye-photography",
+  "main": ".open-next/worker.js",
+  // Keep this at (or after) today's date — see
+  // https://developers.cloudflare.com/workers/configuration/compatibility-dates/
+  "compatibility_date": "2026-09-20",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
+  },
+
+  // Bookings + gallery metadata. Create with:
+  //   npx wrangler kv namespace create DATA_KV
+  // then replace the id below with the one it prints.
+  "kv_namespaces": [
+    {
+      "binding": "DATA_KV",
+      "id": "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+    }
+  ],
+
+  // Uploaded gallery photos. Create with:
+  //   npx wrangler r2 bucket create third-eye-photography-uploads
+  "r2_buckets": [
+    {
+      "binding": "UPLOADS_BUCKET",
+      "bucket_name": "third-eye-photography-uploads"
+    }
+  ]
+
+  // ADMIN_PASSWORD is a secret, not a var — set it with:
+  //   npx wrangler secret put ADMIN_PASSWORD
+}

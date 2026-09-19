@@ -12,7 +12,7 @@ const VALID_STATUSES: Booking["status"][] = [
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = req.cookies.get(ADMIN_COOKIE_NAME)?.value;
   if (!session || session !== (await expectedSessionToken())) {
@@ -26,6 +26,8 @@ export async function PATCH(
     return NextResponse.json({ error: "Invalid status." }, { status: 400 });
   }
 
-  await updateBookingStatus(params.id, status);
+  const { id } = await params;
+
+  await updateBookingStatus(id, status);
   return NextResponse.json({ ok: true });
 }

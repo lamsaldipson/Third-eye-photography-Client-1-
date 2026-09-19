@@ -5,6 +5,8 @@ import ReviewsSection from "@/components/ReviewsSection";
 import { getGallery } from "@/lib/data";
 import { packages } from "@/lib/content";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const images = await getGallery();
   const preview = images.slice(0, 5);

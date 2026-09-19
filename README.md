@@ -28,19 +28,57 @@ Visit `http://localhost:3000`. Sign in to the dashboard at
 
 ## How data is stored
 
-Bookings and gallery metadata are stored in `data/bookings.json` and
-`data/gallery.json`; uploaded photos are saved to `public/uploads/`. This
-keeps the whole project dependency-free and easy to run locally or on any
-host with a normal persistent filesystem (a VPS, Docker, Railway,
-Render, etc).
+Locally (`npm run dev`, or any host with a normal persistent disk — a
+VPS, Docker, Railway, Render, etc), bookings and gallery metadata are
+stored in `data/bookings.json` and `data/gallery.json`, and uploaded
+photos are saved to `public/uploads/`. Every route only talks to the
+functions in `lib/data.ts` and `lib/uploads.ts`, so this is a
+self-contained, dependency-free setup for local development.
 
-**Heads up if you deploy to a serverless platform with a read-only
-filesystem (a default Vercel deployment, for example):** writes to those
-JSON files and to `public/uploads/` won't persist between requests there.
-Every route only talks to the functions in `lib/data.ts`, so swapping in
-a real database (Postgres, Supabase) and an object store (S3,
-Cloudinary) for uploads is a contained change — you shouldn't need to
-touch the page or component code.
+**On Cloudflare** (see below), those same functions automatically switch
+to Cloudflare KV (bookings + gallery metadata) and an R2 bucket
+(uploaded photos) instead, since Workers has no writable, persistent
+filesystem. Uploaded photos are served back through
+`/api/uploads/[filename]`, which streams them out of R2.
+
+## Deploying to Cloudflare
+
+This app deploys to Cloudflare Workers via the
+[OpenNext Cloudflare adapter](https://opennext.js.org/cloudflare), which is
+already wired up (`wrangler.jsonc`, `open-next.config.ts`, and the
+Cloudflare-aware code in `lib/data.ts` / `lib/uploads.ts`).
+
+1. Install the new dependencies: `npm install`.
+2. Log in to Cloudflare: `npx wrangler login`.
+3. Create the KV namespace bookings/gallery data will live in:
+   ```
+   npx wrangler kv namespace create DATA_KV
+   ```
+   Copy the `id` it prints into `wrangler.jsonc`, replacing
+   `REPLACE_WITH_YOUR_KV_NAMESPACE_ID`.
+4. Create the R2 bucket uploaded photos will live in:
+   ```
+   npx wrangler r2 bucket create third-eye-photography-uploads
+   ```
+   (If you'd rather use a different bucket name, update it in
+   `wrangler.jsonc` too.)
+5. Set the admin password as a Worker secret (this is separate from
+   `.env.local`, which only `next dev` reads):
+   ```
+   npx wrangler secret put ADMIN_PASSWORD
+   ```
+6. Optionally regenerate binding types after touching `wrangler.jsonc`:
+   `npm run cf-typegen`.
+7. Preview a production build locally in the actual Workers runtime:
+   `npm run preview`. (For this to have a password to check against, copy
+   `.dev.vars.example` to `.dev.vars` and set `ADMIN_PASSWORD` there —
+   `.dev.vars` is what `wrangler`/`preview` reads locally, separate from
+   the Worker secret you set in step 5 for production.)
+8. Deploy: `npm run deploy`.
+
+After the first deploy, any bookings or gallery uploads made through the
+live `/admin` dashboard are read from and written to that KV namespace
+and R2 bucket — nothing further to configure.
 
 ## Project structure
 
