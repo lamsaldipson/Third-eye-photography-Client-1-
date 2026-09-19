@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-maroon/10;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: theme("colors.marigold.DEFAULT");
+    color: theme("colors.ink");
+  }
+
+  :focus-visible {
+    outline: 2px solid theme("colors.maroon.DEFAULT");
+    outline-offset: 3px;
+  }
+
+  h1, h2, h3 {
+    @apply font-display;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-maroon text-paperlight px-6 py-3 rounded-sm text-[0.95rem] tracking-wide hover:bg-maroon-dark transition-colors duration-200;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 border border-ink/30 text-ink px-6 py-3 rounded-sm text-[0.95rem] tracking-wide hover:border-ink transition-colors duration-200;
+  }
+
+  .field-label {
+    @apply block text-sm text-ink/70 mb-1.5;
+  }
+
+  .field-input {
+    @apply w-full bg-paperlight border border-ink/20 rounded-sm px-3.5 py-2.5 text-ink placeholder:text-ink/35 focus:border-maroon outline-none transition-colors;
+  }
+}
